@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import com.google.gson.internal.LinkedTreeMap
-import com.pymblesoftware.cashmoney.R
 import com.pymblesoftware.cashmoney.data.kotlin.CurrencyRepositoryProvider
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -24,6 +23,9 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var ratesData : LinkedTreeMap<String, String>
     lateinit var currencyList : MutableSet<String>
+    lateinit var spinnerArray : Array<String>
+    lateinit var valuesArray : Array<String>
+
     val compositeDisposable: CompositeDisposable = CompositeDisposable()
 
     fun fetchData() {
@@ -38,14 +40,15 @@ class MainActivity : AppCompatActivity() {
                             Log.d("RR:", "Result ${result.rates.javaClass}" )
                             ratesData = result.rates
                             currencyList = result.rates.keys
+                            valuesArray = result.rates.values.toTypedArray()
 
-                            val spinnerArray = currencyList.toTypedArray()
+                            spinnerArray = currencyList.toTypedArray()
 
                             val spinnerArrayAdapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray) //selected item will look like a spinner set from XML
                             spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-//                            currency_spinner.adapter = spinnerArrayAdapter
-//                            currency_spinner.setOnClickListener {  doCalc() ; Log.v("RR:", "here" ) }
+                            currency_spinner.adapter = spinnerArrayAdapter
+                            currency_spinner.setOnItemClickListener { parent, view, position, id -> doCalc( position) ; }
 
                         }, { error ->
                             error.printStackTrace()
@@ -54,9 +57,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun doCalc() {
+    fun doCalc(  pos :Int ) {
 
-
+        val input = input_editext.text.to(Double) as Double
+        val amt = valuesArray[pos].toDouble() as Double
+        val calcd = input * amt
+        Log.v("RR:", "here ${pos} , ${amt} " )
+        output_text.setText( "${amt}" )
     }
 
 
